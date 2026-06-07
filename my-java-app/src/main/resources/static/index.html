@@ -71,6 +71,22 @@
             color: #facc15;
         }
 
+        .game-over-box {
+            display: none;
+            background: #14532d;
+            border: 1px solid #22c55e;
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-over-box h2 {
+            color: #facc15;
+            margin-bottom: 10px;
+        }
+
         button {
             background: #38bdf8;
             border: none;
@@ -83,6 +99,12 @@
 
         button:hover {
             background: #0ea5e9;
+        }
+
+        button:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .danger {
@@ -106,6 +128,10 @@
             border: none;
             margin: 5px;
             min-width: 260px;
+        }
+
+        select:disabled {
+            opacity: 0.6;
         }
 
         .progress-bar {
@@ -163,6 +189,11 @@
         <div class="result" id="result"></div>
     </div>
 
+    <div class="game-over-box" id="gameOverBox">
+        <h2 id="winnerTitle"></h2>
+        <p id="finalScore"></p>
+    </div>
+
     <div class="grid-two">
         <div class="card">
             <h2>Player Company</h2>
@@ -191,10 +222,10 @@
 
     <div class="card">
         <h2>Actions</h2>
-        <button onclick="workTurn()">Work One Turn</button>
-        <button onclick="hireDeveloper()">Hire Developer</button>
-        <button onclick="hireTester()">Hire Tester</button>
-        <button onclick="hireIntern()">Hire Intern</button>
+        <button id="workBtn" onclick="workTurn()">Work One Turn</button>
+        <button id="devBtn" onclick="hireDeveloper()">Hire Developer</button>
+        <button id="testerBtn" onclick="hireTester()">Hire Tester</button>
+        <button id="internBtn" onclick="hireIntern()">Hire Intern</button>
         <button class="danger" onclick="newGame()">New Game</button>
         <p id="message"></p>
     </div>
@@ -212,7 +243,7 @@
 
         <br><br>
 
-        <button onclick="assignEmployee()">Assign Employee</button>
+        <button id="assignBtn" onclick="assignEmployee()">Assign Employee</button>
     </div>
 
     <div class="grid-two">
@@ -262,6 +293,42 @@
         document.getElementById('aiValue').textContent = data.aiValue;
         document.getElementById('aiEmployees').textContent = data.aiEmployees;
         document.getElementById('aiFinishedProjects').textContent = data.aiFinishedProjects;
+
+        handleGameOver(data);
+    }
+
+    function handleGameOver(data) {
+        const gameOver = data.result !== 'IN_PROGRESS';
+
+        document.getElementById('workBtn').disabled = gameOver;
+        document.getElementById('devBtn').disabled = gameOver;
+        document.getElementById('testerBtn').disabled = gameOver;
+        document.getElementById('internBtn').disabled = gameOver;
+        document.getElementById('assignBtn').disabled = gameOver;
+        document.getElementById('employeeSelect').disabled = gameOver;
+        document.getElementById('projectSelect').disabled = gameOver;
+
+        const box = document.getElementById('gameOverBox');
+
+        if (gameOver) {
+            box.style.display = 'block';
+
+            if (data.result === 'PLAYER_WINS') {
+                document.getElementById('winnerTitle').textContent = '🏆 Player Wins!';
+            } else if (data.result === 'AI_WINS') {
+                document.getElementById('winnerTitle').textContent = '🤖 AI Wins!';
+            } else {
+                document.getElementById('winnerTitle').textContent = '🤝 Draw!';
+            }
+
+            document.getElementById('finalScore').innerHTML =
+                `Player Value: <strong>${data.playerValue}</strong><br>
+                 AI Value: <strong>${data.aiValue}</strong><br>
+                 Player Finished Projects: <strong>${data.playerFinishedProjects}</strong><br>
+                 AI Finished Projects: <strong>${data.aiFinishedProjects}</strong>`;
+        } else {
+            box.style.display = 'none';
+        }
     }
 
     function renderEmployeeList(containerId, employees, selectable) {
