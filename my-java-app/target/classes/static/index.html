@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TechCorp Duel Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #38bdf8;
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: auto;
+        }
+
+        .grid-two {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat {
+            background: #334155;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat strong {
+            color: #38bdf8;
+            font-size: 20px;
+        }
+
+        .status-panel {
+            background: #020617;
+            border: 1px solid #334155;
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            color: #facc15;
+        }
+
+        button {
+            background: #38bdf8;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #0ea5e9;
+        }
+
+        .danger {
+            background: #ef4444;
+        }
+
+        .danger:hover {
+            background: #dc2626;
+        }
+
+        .list-item {
+            background: #334155;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            margin: 5px;
+            min-width: 260px;
+        }
+
+        .progress-bar {
+            background: #0f172a;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 14px;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            background: #38bdf8;
+            height: 100%;
+        }
+
+        .ai-fill {
+            background: #f97316;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .finished {
+            background: #22c55e;
+        }
+
+        .planned {
+            background: #64748b;
+        }
+
+        .inprogress {
+            background: #f59e0b;
+        }
+
+        #message {
+            color: #facc15;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>TechCorp Duel Dashboard</h1>
+
+    <div class="status-panel">
+        <div>Turn: <strong id="turn"></strong> / <strong id="maxTurns"></strong></div>
+        <div>Game Result:</div>
+        <div class="result" id="result"></div>
+    </div>
+
+    <div class="grid-two">
+        <div class="card">
+            <h2>Player Company</h2>
+            <div class="stats">
+                <div class="stat">Company<br><strong id="playerCompany"></strong></div>
+                <div class="stat">Budget<br><strong id="playerBudget"></strong></div>
+                <div class="stat">Reputation<br><strong id="playerReputation"></strong></div>
+                <div class="stat">Value<br><strong id="playerValue"></strong></div>
+                <div class="stat">Employees<br><strong id="playerEmployees"></strong></div>
+                <div class="stat">Finished Projects<br><strong id="playerFinishedProjects"></strong></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>AI Company</h2>
+            <div class="stats">
+                <div class="stat">Company<br><strong id="aiCompany"></strong></div>
+                <div class="stat">Budget<br><strong id="aiBudget"></strong></div>
+                <div class="stat">Reputation<br><strong id="aiReputation"></strong></div>
+                <div class="stat">Value<br><strong id="aiValue"></strong></div>
+                <div class="stat">Employees<br><strong id="aiEmployees"></strong></div>
+                <div class="stat">Finished Projects<br><strong id="aiFinishedProjects"></strong></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Actions</h2>
+        <button onclick="workTurn()">Work One Turn</button>
+        <button onclick="hireDeveloper()">Hire Developer</button>
+        <button onclick="hireTester()">Hire Tester</button>
+        <button onclick="hireIntern()">Hire Intern</button>
+        <button class="danger" onclick="newGame()">New Game</button>
+        <p id="message"></p>
+    </div>
+
+    <div class="card">
+        <h2>Assign Employee to Player Project</h2>
+
+        <label>Employee</label><br>
+        <select id="employeeSelect"></select>
+
+        <br><br>
+
+        <label>Project</label><br>
+        <select id="projectSelect"></select>
+
+        <br><br>
+
+        <button onclick="assignEmployee()">Assign Employee</button>
+    </div>
+
+    <div class="grid-two">
+        <div class="card">
+            <h2>Player Employees</h2>
+            <div id="employees"></div>
+        </div>
+
+        <div class="card">
+            <h2>AI Employees</h2>
+            <div id="aiEmployeesList"></div>
+        </div>
+    </div>
+
+    <div class="grid-two">
+        <div class="card">
+            <h2>Player Projects</h2>
+            <div id="projects"></div>
+        </div>
+
+        <div class="card">
+            <h2>AI Projects</h2>
+            <div id="aiProjects"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function loadState() {
+        const response = await fetch('/game/state');
+        const data = await response.json();
+
+        document.getElementById('turn').textContent = data.turn;
+        document.getElementById('maxTurns').textContent = data.maxTurns;
+        document.getElementById('result').textContent = data.result;
+
+        document.getElementById('playerCompany').textContent = data.playerCompany;
+        document.getElementById('playerBudget').textContent = data.playerBudget;
+        document.getElementById('playerReputation').textContent = data.playerReputation;
+        document.getElementById('playerValue').textContent = data.playerValue;
+        document.getElementById('playerEmployees').textContent = data.playerEmployees;
+        document.getElementById('playerFinishedProjects').textContent = data.playerFinishedProjects;
+
+        document.getElementById('aiCompany').textContent = data.aiCompany;
+        document.getElementById('aiBudget').textContent = data.aiBudget;
+        document.getElementById('aiReputation').textContent = data.aiReputation;
+        document.getElementById('aiValue').textContent = data.aiValue;
+        document.getElementById('aiEmployees').textContent = data.aiEmployees;
+        document.getElementById('aiFinishedProjects').textContent = data.aiFinishedProjects;
+    }
+
+    function renderEmployeeList(containerId, employees, selectable) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+
+        employees.forEach((employee, index) => {
+            container.innerHTML += `
+                <div class="list-item">
+                    <strong>${selectable ? index + '. ' : ''}${employee.name}</strong><br>
+                    Role: ${employee.role}<br>
+                    Skill: ${employee.skill}<br>
+                    Salary: ${employee.salary}
+                </div>
+            `;
+        });
+    }
+
+    async function loadEmployees() {
+        const response = await fetch('/game/employees');
+        const employees = await response.json();
+
+        const select = document.getElementById('employeeSelect');
+        select.innerHTML = '';
+
+        employees.forEach((employee, index) => {
+            select.innerHTML += `
+                <option value="${index}">
+                    ${employee.name} (${employee.role}) - Skill ${employee.skill}
+                </option>
+            `;
+        });
+
+        renderEmployeeList('employees', employees, true);
+    }
+
+    async function loadAiEmployees() {
+        const response = await fetch('/game/ai-employees');
+        const employees = await response.json();
+
+        renderEmployeeList('aiEmployeesList', employees, false);
+    }
+
+    function renderProjectList(containerId, projects, isAi) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+
+        projects.forEach((project, index) => {
+            const percent = Math.round((project.progress / project.requiredWork) * 100);
+
+            let badgeClass = 'planned';
+            if (project.status === 'FINISHED') {
+                badgeClass = 'finished';
+            } else if (project.status === 'IN_PROGRESS') {
+                badgeClass = 'inprogress';
+            }
+
+            container.innerHTML += `
+                <div class="list-item">
+                    <strong>${isAi ? '' : index + '. '}${project.name}</strong><br>
+                    Progress: ${project.progress}/${project.requiredWork} (${percent}%)<br>
+                    Reward: ${project.reward}<br>
+                    Strategic: ${project.strategic}<br>
+                    Status: <span class="badge ${badgeClass}">${project.status}</span>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill ${isAi ? 'ai-fill' : ''}" style="width: ${percent}%"></div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    async function loadProjects() {
+        const response = await fetch('/game/projects');
+        const projects = await response.json();
+
+        const select = document.getElementById('projectSelect');
+        select.innerHTML = '';
+
+        projects.forEach((project, index) => {
+            select.innerHTML += `
+                <option value="${index}">
+                    ${project.name} - ${project.progress}/${project.requiredWork}
+                </option>
+            `;
+        });
+
+        renderProjectList('projects', projects, false);
+    }
+
+    async function loadAiProjects() {
+        const response = await fetch('/game/ai-projects');
+        const projects = await response.json();
+
+        renderProjectList('aiProjects', projects, true);
+    }
+
+    async function refreshAll() {
+        await loadState();
+        await loadEmployees();
+        await loadAiEmployees();
+        await loadProjects();
+        await loadAiProjects();
+    }
+
+    async function workTurn() {
+        const response = await fetch('/game/work', { method: 'POST' });
+        document.getElementById('message').textContent = await response.text();
+        refreshAll();
+    }
+
+    async function hireDeveloper() {
+        const response = await fetch('/game/hire/developer', { method: 'POST' });
+        document.getElementById('message').textContent = await response.text();
+        refreshAll();
+    }
+
+    async function hireTester() {
+        const response = await fetch('/game/hire/tester', { method: 'POST' });
+        document.getElementById('message').textContent = await response.text();
+        refreshAll();
+    }
+
+    async function hireIntern() {
+        const response = await fetch('/game/hire/intern', { method: 'POST' });
+        document.getElementById('message').textContent = await response.text();
+        refreshAll();
+    }
+
+    async function newGame() {
+        const response = await fetch('/game/new', { method: 'POST' });
+        document.getElementById('message').textContent = await response.text();
+        refreshAll();
+    }
+
+    async function assignEmployee() {
+        const employeeIndex = document.getElementById('employeeSelect').value;
+        const projectIndex = document.getElementById('projectSelect').value;
+
+        const response = await fetch(
+            `/game/assign?employeeIndex=${employeeIndex}&projectIndex=${projectIndex}`,
+            { method: 'POST' }
+        );
+
+        document.getElementById('message').textContent = await response.text();
+        refreshAll();
+    }
+
+    refreshAll();
+</script>
+
+</body>
+</html>
